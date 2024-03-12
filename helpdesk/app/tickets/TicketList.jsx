@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import React from 'react'
+import { promiseHooks } from 'v8'
 
 async function getTickets() {
+    await new Promise(resolve => setTimeout(resolve,3000))
     const res = await fetch('http://localhost:3000/tickets', {
         next: {
             revalidate: 0
