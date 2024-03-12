@@ -1,4 +1,18 @@
+import { PageNotFoundError } from 'next/dist/shared/lib/utils'
+import dynamic from 'next/dynamic'
+import { notFound } from 'next/navigation'
 import React from 'react'
+
+export const dynamicParams = false
+export async function generatestaticParams(){
+    const res = await fetch('http://localhost:3000/tickets')
+
+    const tickets = await res.json()
+
+    return tickets.map((ticket) => ({
+        id: ticket.id
+    }))
+}
 
 async function getTicket(id) {
     const res = await fetch('http://localhost:3000/tickets/' +id, {
@@ -7,6 +21,9 @@ async function getTicket(id) {
         }
     })
 
+    if (!res.ok){
+        notFound()
+    }
     return res.json()
 }
 
