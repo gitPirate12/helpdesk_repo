@@ -1,49 +1,49 @@
-import { PageNotFoundError } from 'next/dist/shared/lib/utils'
-import dynamic from 'next/dynamic'
-import { notFound } from 'next/navigation'
-import React from 'react'
+import { notFound } from "next/navigation"
 
-export const dynamicParams = false
-export async function generatestaticParams(){
-    const res = await fetch('http://localhost:3000/tickets')
+export const dynamicParams = true // default val = true
 
-    const tickets = await res.json()
+export async function generateStaticParams() {
+  const res = await fetch('http://localhost:3001/tickets')
 
-    return tickets.map((ticket) => ({
-        id: ticket.id
-    }))
+  const tickets = await res.json()
+ 
+  return tickets.map((ticket) => ({
+    id: ticket.id
+  }))
 }
 
 async function getTicket(id) {
-    await new Promise(resolve => setTimeout(resolve,3000))
-    const res = await fetch('http://localhost:3000/tickets/' +id, {
-        next: {
-            revalidate: 60
-        }
-    })
-
-    if (!res.ok){
-        notFound()
+  const res = await fetch(`http://localhost:3001/tickets/${id}`, {
+    next: {
+      revalidate: 60
     }
-    return res.json()
+  })
+
+  if (!res.ok) {
+    notFound()
+  }
+
+  return res.json()
 }
 
-export default async function TicketDetails({params}) {
-    const ticket = await getTicket(params.id)
-    
+
+export default async function TicketDetails({ params }) {
+  // const id = params.id
+  const ticket = await getTicket(params.id)
+
   return (
     <main>
-        <nav>
-            <h2>Ticket Details</h2>
-        </nav>
-        <div className='card'>
-            <h3>{ticket.title}</h3>
-            <small>Created by {ticket.user_email}</small>
-            <p>{ticket.body}</p>
-            <div className={`pill ${ticket.priority}`}>
-                {ticket.priority} priority
-            </div>
+      <nav>
+        <h2>Ticket Details</h2>
+      </nav>
+      <div className="card">
+        <h3>{ticket.title}</h3>
+        <small>Created by {ticket.user_email}</small>
+        <p>{ticket.body}</p>
+        <div className={`pill ${ticket.priority}`}>
+          {ticket.priority} priority
         </div>
+      </div>
     </main>
   )
 }
